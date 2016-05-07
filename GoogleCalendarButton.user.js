@@ -1,16 +1,19 @@
 ﻿// ==UserScript==
 // @name         Google Calendar Button on Abema.tv
 // @namespace    http://www.TakeAsh.net/
-// @version      0.1.201605071700
+// @version      0.1.201605071800
 // @description  Add Abema.tv program to Google Calendar
 // @author       TakeAsh
-// @match        https://abema.tv/channels/*/slots/*
+// @match        https://abema.tv/channels/*
 // @grant        none
 // ==/UserScript==
 
 (function() {
     'use strict';
 
+    if (!location.href.match(/https:\/\/abema.tv\/channels\/[^\/]+\/slots\//)) {
+        return;
+    }
     var googleCalendarButton = document.createElement('button');
     googleCalendarButton.innerHTML = 'Google Calendar';
     googleCalendarButton.style.color = '#FFFFFF';
