@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         Google Calendar Button on Abema.tv
 // @namespace    http://www.TakeAsh.net/
-// @version      0.1.201605071800
+// @version      0.1.201605220830
 // @description  Add Abema.tv program to Google Calendar
 // @author       TakeAsh
 // @match        https://abema.tv/channels/*
@@ -27,8 +27,10 @@
 
     function addGoogleCalendar() {
         var calendarUrl = 'https://calendar.google.com/calendar/event?';
+        var titlePath = '//div[@id="main"]/div/div[3]/div/div[2]/div/section/div/div/h2';
         var spanPath = '//div[@id="main"]/div/div[3]/div/div[2]/div/section/div/div/p';
         var descriptionPath = '//div[@id="main"]/div/div[3]/div/div[2]/div/section[2]/div/p';
+        var title = getStringByXpath(titlePath, document);
         var span = getStringByXpath(spanPath, document).split('~');
         var description = getStringByXpath(descriptionPath, document);
         var regDate = /(\d+)\u6708(\d+)\u65E5/;
@@ -56,7 +58,7 @@
         var channel = 'https://abema.tv/now-on-air/' + RegExp.$1;
         var params = EncodeQuery({
             action: 'TEMPLATE',
-            text: document.title,
+            text: title,
             dates: span2[0] + '/' + span2[1],
             location: channel,
             details: location.href + '\n' + description
