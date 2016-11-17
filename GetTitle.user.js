@@ -1,7 +1,7 @@
-﻿javascript: (function() {
-  var basePath = '//div[@id="main"]/div/div[3]/div/div[2]/div/div/';
+﻿javascript: (function () {
+  var basePath = '//main/div/div/div[2]/div/div/';
   var title = getStringByXpath(basePath + 'h2', document);
-  var span = getStringByXpath(basePath + 'p[2]', document);
+  var span = getStringByXpath(basePath + 'p[3]', document);
   location.pathname.match(/channels\/([^\/]+)\//);
   var channel = 'https://abema.tv/now-on-air/' + RegExp.$1;
   var summary = title + '\n' + span + '\n' + channel + '\n' + location.href;
