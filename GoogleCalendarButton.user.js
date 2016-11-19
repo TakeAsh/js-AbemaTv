@@ -27,12 +27,10 @@
 
     function addGoogleCalendar() {
         var calendarUrl = 'https://calendar.google.com/calendar/event?';
-        var titlePath = '//div[@id="main"]/div/div[3]/div/div[2]/div/div/h2';
-        var spanPath = '//div[@id="main"]/div/div[3]/div/div[2]/div/div/p[2]';
-        var descriptionPath = '//div[@id="main"]/div/div[3]/div/div[2]/div/div[2]/p';
-        var title = getStringByXpath(titlePath, document);
-        var span = getStringByXpath(spanPath, document).split('~');
-        var description = getStringByXpath(descriptionPath, document);
+        var basePath = '//main/div/div/div[2]/div/';
+        var title = getStringByXpath(basePath + 'div/h2', document);
+        var span = getStringByXpath(basePath + 'div/p[3]', document).split(/[~〜]/);
+        var description = getStringByXpath(basePath + 'div[2]/p', document);
         var regDate = /(\d+)\u6708(\d+)\u65E5/;
         var regTime = /(\d+):(\d+)/;
         var now = new Date();
