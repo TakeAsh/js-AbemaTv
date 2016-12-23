@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         Google Calendar Button on Abema.tv
 // @namespace    http://www.TakeAsh.net/
-// @version      0.1.201607090200
+// @version      0.1.201612231600
 // @description  Add Abema.tv program to Google Calendar
 // @author       TakeAsh
 // @match        https://abema.tv/channels/*
@@ -33,9 +33,10 @@
         var description = getStringByXpath(basePath + 'div[2]/p', document);
         var regDate = /(\d+)\u6708(\d+)\u65E5/;
         var regTime = /(\d+):(\d+)/;
+        var nowMonth = 0;
         var now = new Date();
         var year = now.getFullYear();
-        var month = now.getMonth() + 1;
+        var month = nowMonth = now.getMonth() + 1;
         var date = now.getDate();
         var hours = now.getHours();
         var minutes = now.getMinutes();
@@ -45,6 +46,9 @@
             if ((m = regDate.exec(t))) {
                 month = m[1];
                 date = m[2];
+                if (month < nowMonth) {
+                    ++year;
+                }
             }
             if ((m = regTime.exec(t))) {
                 hours = m[1];
@@ -66,12 +70,10 @@
     }
 
     function getStringByXpath(xpath, context) {
-        var sRet = "";
         var nodeTmp = document.evaluate('string(' + xpath + ')', context, null, XPathResult.STRING_TYPE, null);
-        if (nodeTmp) {
-            sRet = nodeTmp.stringValue;
-        }
-        return sRet;
+        return !nodeTmp ?
+            "" :
+            nodeTmp.stringValue;
     }
 
     function packZero(x, n) {
