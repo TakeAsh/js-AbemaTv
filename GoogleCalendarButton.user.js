@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         Google Calendar Button on Abema.tv
 // @namespace    http://www.TakeAsh.net/
-// @version      0.1.201612231600
+// @version      0.1.201612251700
 // @description  Add Abema.tv program to Google Calendar
 // @author       TakeAsh
 // @match        https://abema.tv/channels/*
@@ -48,6 +48,7 @@
                 date = m[2];
                 if (month < nowMonth) {
                     ++year;
+                    nowMonth = month;
                 }
             }
             if ((m = regTime.exec(t))) {
