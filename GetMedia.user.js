@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.201710190530
+// @version      0.1.201710250300
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
@@ -39,6 +39,8 @@
   getMediaButton.appendChild(document.createTextNode('Get Media'));
   getMediaButton.addEventListener('click', getMedia, false);
   getMediaPanel.appendChild(getMediaButton);
+  var downloadLink = document.createElement('a');
+  downloadLink.href = '#';
 
   function getDate(dateAdd) {
     var d = new Date();
@@ -58,10 +60,15 @@
   }
 
   function onSuccess(data) {
-    var docNew = window.open('', '_blank').document;
-    docNew.open('text/html; charset="UTF-8"');
-    docNew.write('<html><body><pre>\n' + data + '</pre></body></html>');
-    docNew.close();
+    var fname = getDate(0) + '.' + channels[channelSelecter.selectedIndex] + '.json';
+    var blob = new Blob([data], { 'type': 'application/json; charset=utf-8' });
+    if (window.navigator.msSaveBlob) {
+      window.navigator.msSaveBlob(blob, fname);
+    } else {
+      downloadLink.download = fname;
+      downloadLink.href = window.URL.createObjectURL(blob);
+      downloadLink.click();
+    }
   }
 
   function onError(error) {
