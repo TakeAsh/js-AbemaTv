@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Add Capture Button
 // @namespace    http://www.TakeAsh.net/
-// @version      0.1.201712270100
+// @version      0.1.201712271900
 // @description  add capture button
 // @author       TakeAsh
 // @match        https://abema.tv/now-on-air/*
@@ -75,9 +75,8 @@
     );
     var elmImg = new Image();
     elmImg.onload = function() {
-      panelCapture.appendChild(elmImg);
       linkDownload.click();
-      elmImg.parentNode.removeChild(elmImg);
+      elmImg = null; // There is no dispose method.
       buttonCapture.disabled = false;
       clearTimeout(timerId);
     };
