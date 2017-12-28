@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Add Capture Button
 // @namespace    http://www.TakeAsh.net/
-// @version      0.1.201712271900
+// @version      0.1.201712282130
 // @description  add capture button
 // @author       TakeAsh
 // @match        https://abema.tv/now-on-air/*
@@ -93,6 +93,7 @@
     var hour = ('0' + d.getHours().toString()).substr(-2);
     var min = ('0' + d.getMinutes().toString()).substr(-2);
     var second = ('0' + d.getSeconds().toString()).substr(-2);
-    return year + month + day + hour + min + second;
+    var millisec = ('00' + d.getMilliseconds().toString()).substr(-3);
+    return year + month + day + hour + min + second + millisec;
   }
 })();
