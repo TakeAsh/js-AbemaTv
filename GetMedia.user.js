@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.201804301100
+// @version      0.1.201804301630
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
@@ -17,6 +17,7 @@
     'abema-anime', 'abema-anime-2', 'anime-live', 'everybody-anime',
     'abema-radio',
   ];
+  var dateShift = 0;
   var getMediaPanel = document.createElement('div');
   getMediaPanel.id = 'getMedia';
   getMediaPanel.style.position = 'fixed';
@@ -44,6 +45,7 @@
   downloadLink.href = '#';
 
   function getDate(dateAdd) {
+    dateAdd = dateAdd || 0;
     var d = new Date();
     d.setTime(d.getTime() + dateAdd * 24 * 60 * 60 * 1000);
     var year = d.getFullYear().toString();
@@ -61,7 +63,7 @@
   }
 
   function onSuccess(data) {
-    var fname = getDate(0) + '.' + channels[channelSelecter.selectedIndex] + '.json';
+    var fname = getDate(dateShift) + '.' + channels[channelSelecter.selectedIndex] + '.json';
     var blob = new Blob([data], { 'type': 'application/json; charset=utf-8' });
     if (window.navigator.msSaveBlob) {
       window.navigator.msSaveBlob(blob, fname);
@@ -84,8 +86,8 @@
     var apiUrl = 'https://api.abema.io/v1/media?';
     var token = localStorage.getItem('abm_token');
     var result = { data: null, error: null };
-    var dateFrom = getDate(0);
-    var dateTo = getDate(14);
+    var dateFrom = getDate(dateShift);
+    var dateTo = getDate(dateShift + 14);
 
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
