@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.201804301630
+// @version      0.1.201807142330
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
@@ -14,7 +14,8 @@
 
   var channels = [
     'abema-special', 'drama',
-    'abema-anime', 'abema-anime-2', 'anime-live', 'everybody-anime',
+    'abema-anime', 'abema-anime-2', 'anime-live', 'anime-live2',
+    'everybody-anime', 'everybody-anime2',
     'abema-radio',
   ];
   var dateShift = 0;
