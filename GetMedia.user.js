@@ -15,7 +15,7 @@
   var channels = [
     'abema-special', 'drama',
     'abema-anime', 'abema-anime-2', 'anime-live', 'anime-live2',
-    'everybody-anime', 'everybody-anime2',
+    'everybody-anime', 'everybody-anime2', 'everybody-anime3',
     'abema-radio',
   ];
   var dateShift = 0;
