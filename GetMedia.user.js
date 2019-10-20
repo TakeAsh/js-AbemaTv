@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.201905011800
+// @version      0.1.201910201630
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
@@ -12,13 +12,12 @@
 (function() {
   'use strict';
 
-  var channels = [
-    'abema-special', 'drama',
-    'abema-anime', 'abema-anime-2', 'anime-live', 'anime-live2',
-    'everybody-anime', 'everybody-anime2', 'everybody-anime3',
-    'abema-radio',
-  ];
+  var apiUrl = 'https://api.abema.io/v1/';
+  var token = localStorage.getItem('abm_token');
+  var channels = [];
   var dateShift = 0;
+  var dateFrom = getDate(dateShift);
+  var dateTo = getDate(dateShift + 14);
   var getMediaPanel = document.createElement('div');
   getMediaPanel.id = 'getMedia';
   getMediaPanel.style.position = 'fixed';
@@ -27,23 +26,18 @@
   getMediaPanel.style.padding = '4px';
   getMediaPanel.style.zIndex = 16;
   getMediaPanel.style.background = 'rgba(255, 255, 255, 0.6)';
-  setTimeout(
-    function() { document.body.appendChild(getMediaPanel); },
-    4000
-  );
   var channelSelecter = document.createElement('select');
-  for (var i = 0, chennel; (chennel = channels[i]); ++i) {
-    var opt = document.createElement('option');
-    opt.appendChild(document.createTextNode(chennel));
-    channelSelecter.appendChild(opt);
-  }
   getMediaPanel.appendChild(channelSelecter);
   var getMediaButton = document.createElement('button');
+  getMediaButton.id = 'buttonGetMedia';
+  getMediaButton.style.backgroundColor = '#e0e0e0';
+  getMediaButton.style.padding = '2px';
   getMediaButton.appendChild(document.createTextNode('Get Media'));
-  getMediaButton.addEventListener('click', getMedia, false);
+  getMediaButton.addEventListener('click', makeApiCaller('media', onGetMedia), false);
   getMediaPanel.appendChild(getMediaButton);
   var downloadLink = document.createElement('a');
   downloadLink.href = '#';
+  setTimeout(makeApiCaller('media', onGetChannels), 1000); // 'channels' is blocked by CORS policy
 
   function getDate(dateAdd) {
     dateAdd = dateAdd || 0;
@@ -63,9 +57,23 @@
     return ret.join('&');
   }
 
-  function onSuccess(data) {
-    var fname = getDate(dateShift) + '.' + channels[channelSelecter.selectedIndex] + '.json';
-    var blob = new Blob([data], { 'type': 'application/json; charset=utf-8' });
+  function onGetChannels(data) {
+    data.channels.forEach(function(channel) {
+      var opt = document.createElement('option');
+      opt.value = channel.id;
+      opt.appendChild(document.createTextNode(channel.name.replace('チャンネル', '')));
+      channelSelecter.appendChild(opt);
+      channels.push(channel.id);
+    });
+    document.body.appendChild(getMediaPanel);
+  }
+
+  function onGetMedia(data) {
+    var fname = dateFrom + '.' + channels[channelSelecter.selectedIndex] + '.json';
+    var blob = new Blob(
+      [JSON.stringify(data, null, 2)],
+      { 'type': 'application/json; charset=utf-8', }
+    );
     if (window.navigator.msSaveBlob) {
       window.navigator.msSaveBlob(blob, fname);
     } else {
@@ -83,37 +91,36 @@
     onError(new Error('Request timed out'));
   }
 
-  function getMedia() {
-    var apiUrl = 'https://api.abema.io/v1/media?';
-    var token = localStorage.getItem('abm_token');
-    var result = { data: null, error: null };
-    var dateFrom = getDate(dateShift);
-    var dateTo = getDate(dateShift + 14);
-
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        try {
-          var data = JSON.parse(xhr.responseText);
-          if (xhr.status === 200) {
-            onSuccess(JSON.stringify(data, null, 2));
-          } else {
-            onError(data.message);
+  function makeApiCaller(api, callback) {
+    return function() {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          try {
+            var data = JSON.parse(xhr.responseText);
+            if (xhr.status === 200) {
+              callback(data);
+            } else {
+              onError(data.message);
+            }
+          } catch (e) {
+            onError(e);
           }
-        } catch (e) {
-          onError(e);
         }
+      };
+      xhr.onerror = onError;
+      xhr.ontimeout = onTimeout;
+      xhr.timeout = 8000;
+      var query = {
+        'dateFrom': dateFrom,
+        'dateTo': dateTo,
+      };
+      if (this && (this.id == 'buttonGetMedia')) {
+        query.channelIds = channels[channelSelecter.selectedIndex];
       }
+      xhr.open('GET', apiUrl + api + '?' + encodeQueryData(query));
+      xhr.setRequestHeader('Authorization', 'bearer ' + token);
+      xhr.send();
     };
-    xhr.onerror = onError;
-    xhr.ontimeout = onTimeout;
-    xhr.open('GET', apiUrl + encodeQueryData({
-      'dateFrom': dateFrom,
-      'dateTo': dateTo,
-      'channelIds': channels[channelSelecter.selectedIndex],
-    }));
-    xhr.timeout = 8000;
-    xhr.setRequestHeader('Authorization', 'bearer ' + token);
-    xhr.send();
   }
 })();
