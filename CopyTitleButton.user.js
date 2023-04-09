@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         Copy Title Button
 // @namespace    https://www.TakeAsh.net/
-// @version      0.1
+// @version      0.1.202304091400
 // @description  add Copy Title Button
 // @author       TakeAsh
 // @match        https://abema.tv/video/title/*
@@ -16,11 +16,17 @@ javascript:
   style.textContent = [
     '.buttonCopyTitle {',
     'background-color: #d0d0d0;',
+    'box-shadow: 0 0.3em 0 #a0a0a0;',
     'padding: 0.1em 0.4em;',
+    'border-radius: 6px;',
     'position: relative;',
     'z-index: 10;',
-    '}'
-  ].join(' ');
+    '}',
+    '.buttonCopyTitle:active {',
+    'transform: translateY(0.2em);',
+    'box-shadow: 0 0.1em 0 #a0a0a0;',
+    '}',
+  ].join('\n');
   d.head.appendChild(style);
   const ul = getNodesByXpath('//*[@id="main"]//main//section/ul')[0];
   getNodesByXpath('.//a', ul).forEach((a) => {
