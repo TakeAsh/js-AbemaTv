@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.202304102130
+// @version      0.1.202304110130
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
@@ -36,31 +36,41 @@
     'transform: translateY(0.2em);',
     'box-shadow: 0 0.1em 0 #808080;',
     '}',
+    '.alignRight {',
+    'text-align: right;',
+    '}',
   ].join('\n');
   d.head.appendChild(style);
   const apiUrl = 'https://api.abema.io/v1';
   const token = localStorage.getItem('abm_token');
   const dateShift = 0;
-  const getMediaPanel = d.createElement('div');
-  getMediaPanel.id = 'getMedia';
-  const divButton = d.createElement('div');
-  divButton.style.textAlign = 'right';
-  getMediaPanel.appendChild(divButton);
-  const getMediaButton = d.createElement('button');
-  getMediaButton.id = 'buttonGetMedia';
-  getMediaButton.textContent = 'Get Media';
-  getMediaButton.addEventListener('click', getMedia);
-  divButton.appendChild(getMediaButton);
-  const divSelect = d.createElement('div');
-  getMediaPanel.appendChild(divSelect);
-  const channelSelecter = d.createElement('select');
-  channelSelecter.multiple = true;
-  channelSelecter.size = 8;
-  channelSelecter.addEventListener('change', saveFavoriteChannels);
-  divSelect.appendChild(channelSelecter);
-  const downloadLink = d.createElement('a');
-  downloadLink.href = '#';
-  d.body.appendChild(getMediaPanel);
+  d.body.appendChild(prepareElement(
+    'details', {
+    id: 'getMedia',
+    children: [
+      ['summary', {
+        classes: ['alignRight'],
+        children: [
+          ['button', {
+            id: 'buttonGetMedia',
+            textContent: 'Get Media',
+            events: { click: getMedia, },
+          }],
+          ['span', {
+            innerHTML: '&#x2699;',
+          }],
+        ],
+      }],
+      ['select', {
+        id: 'selectChannels',
+        multiple: true,
+        size: 8,
+        events: { change: saveFavoriteChannels, },
+      }],
+    ],
+  }));
+  const channelSelecter = d.getElementById('selectChannels');
+  const downloadLink = prepareElement('a', { href: '#', });
   onGetChannels(await callApi('media'));
 
   function sleep(ms) {
@@ -94,6 +104,30 @@
       keyFavoriteChannels,
       Object.keys(favoriteChannels).sort().join('\n')
     );
+  }
+
+  function prepareElement(tag, attributes = {}) {
+    const elm = d.createElement(tag);
+    if (attributes.classes) {
+      attributes.classes.forEach((name) => {
+        elm.classList.add(name);
+      });
+      delete attributes.classes;
+    }
+    if (attributes.events) {
+      Object.keys(attributes.events).forEach((event) => {
+        elm.addEventListener(event, attributes.events[event]);
+      });
+      delete attributes.events;
+    }
+    if (attributes.children) {
+      attributes.children.forEach((child) => {
+        elm.appendChild(prepareElement(...child));
+      });
+      delete attributes.children;
+    }
+    Object.assign(elm, attributes);
+    return elm;
   }
 
   function getDate(dateAdd) {
@@ -156,11 +190,12 @@
         return channel;
       }).sort((a, b) => a.name.localeCompare(b.name))
       .forEach((channel) => {
-        const opt = d.createElement('option');
-        opt.value = channel.id;
-        opt.selected = !!favoriteChannels[channel.id];
-        opt.textContent = channel.name;
-        channelSelecter.appendChild(opt);
+        channelSelecter.appendChild(prepareElement(
+          'option', {
+          value: channel.id,
+          selected: !!favoriteChannels[channel.id],
+          textContent: channel.name,
+        }));
       });
   }
 
