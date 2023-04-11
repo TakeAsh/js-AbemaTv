@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.202304110130
+// @version      0.1.202304120600
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
@@ -44,30 +44,28 @@
   const apiUrl = 'https://api.abema.io/v1';
   const token = localStorage.getItem('abm_token');
   const dateShift = 0;
-  d.body.appendChild(prepareElement(
-    'details', {
+  d.body.appendChild(prepareElement({
+    tag: 'details',
     id: 'getMedia',
-    children: [
-      ['summary', {
-        classes: ['alignRight'],
-        children: [
-          ['button', {
-            id: 'buttonGetMedia',
-            textContent: 'Get Media',
-            events: { click: getMedia, },
-          }],
-          ['span', {
-            innerHTML: '&#x2699;',
-          }],
-        ],
-      }],
-      ['select', {
-        id: 'selectChannels',
-        multiple: true,
-        size: 8,
-        events: { change: saveFavoriteChannels, },
-      }],
-    ],
+    children: [{
+      tag: 'summary',
+      classes: ['alignRight'],
+      children: [{
+        tag: 'button',
+        id: 'buttonGetMedia',
+        textContent: 'Get Media',
+        events: { click: getMedia, },
+      }, {
+        tag: 'span',
+        innerHTML: '&#x2699;',
+      },],
+    }, {
+      tag: 'select',
+      id: 'selectChannels',
+      multiple: true,
+      size: 8,
+      events: { change: saveFavoriteChannels, },
+    },],
   }));
   const channelSelecter = d.getElementById('selectChannels');
   const downloadLink = prepareElement('a', { href: '#', });
@@ -106,27 +104,30 @@
     );
   }
 
-  function prepareElement(tag, attributes = {}) {
+  function prepareElement(tagInfo) {
+    const tag = tagInfo.tag;
+    if (!tag) { return; }
     const elm = d.createElement(tag);
-    if (attributes.classes) {
-      attributes.classes.forEach((name) => {
+    delete tagInfo.tag;
+    if (tagInfo.classes) {
+      tagInfo.classes.forEach((name) => {
         elm.classList.add(name);
       });
-      delete attributes.classes;
+      delete tagInfo.classes;
     }
-    if (attributes.events) {
-      Object.keys(attributes.events).forEach((event) => {
-        elm.addEventListener(event, attributes.events[event]);
+    if (tagInfo.events) {
+      Object.keys(tagInfo.events).forEach((event) => {
+        elm.addEventListener(event, tagInfo.events[event]);
       });
-      delete attributes.events;
+      delete tagInfo.events;
     }
-    if (attributes.children) {
-      attributes.children.forEach((child) => {
-        elm.appendChild(prepareElement(...child));
+    if (tagInfo.children) {
+      tagInfo.children.forEach((child) => {
+        elm.appendChild(prepareElement(child));
       });
-      delete attributes.children;
+      delete tagInfo.children;
     }
-    Object.assign(elm, attributes);
+    Object.assign(elm, tagInfo);
     return elm;
   }
 
@@ -190,8 +191,8 @@
         return channel;
       }).sort((a, b) => a.name.localeCompare(b.name))
       .forEach((channel) => {
-        channelSelecter.appendChild(prepareElement(
-          'option', {
+        channelSelecter.appendChild(prepareElement({
+          tag: 'option',
           value: channel.id,
           selected: !!favoriteChannels[channel.id],
           textContent: channel.name,
