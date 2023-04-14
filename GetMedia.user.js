@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.202304120600
+// @version      0.1.202304150730
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
@@ -68,7 +68,6 @@
     },],
   }));
   const channelSelecter = d.getElementById('selectChannels');
-  const downloadLink = prepareElement('a', { href: '#', });
   onGetChannels(await callApi('media'));
 
   function sleep(ms) {
@@ -209,10 +208,13 @@
     if (window.navigator.msSaveBlob) {
       window.navigator.msSaveBlob(blob, fname);
     } else {
-      downloadLink.download = fname;
-      downloadLink.href = window.URL.createObjectURL(blob);
+      const downloadLink = prepareElement({
+        tag: 'a',
+        download: fname,
+        href: URL.createObjectURL(blob),
+      });
       downloadLink.click();
-      window.URL.revokeObjectURL(downloadLink.href);
+      URL.revokeObjectURL(downloadLink.href);
     }
   }
 })(document);
