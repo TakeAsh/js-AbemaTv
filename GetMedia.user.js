@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.202304150730
+// @version      0.1.202304190430
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
@@ -16,31 +16,29 @@
   await sleep(3000);
   const keyFavoriteChannels = 'GetMedia_FavoriteChannels';
   const favoriteChannels = loadFavoriteChannels();
-  const style = d.createElement('style');
-  style.textContent = [
-    '#getMedia {',
-    'position: fixed;',
-    'top: 0.5em;',
-    'right: 0;',
-    'padding: 4px;',
-    'z-index: 16;',
-    'background-color: rgba(255, 255, 255, 0.6);',
-    '}',
-    '#buttonGetMedia {',
-    'background-color: #e0e0e0;',
-    'box-shadow: 0 0.3em 0 #808080;',
-    'padding: 2px;',
-    'margin: 0.3em;',
-    '}',
-    '#buttonGetMedia:active {',
-    'transform: translateY(0.2em);',
-    'box-shadow: 0 0.1em 0 #808080;',
-    '}',
-    '.alignRight {',
-    'text-align: right;',
-    '}',
-  ].join('\n');
-  d.head.appendChild(style);
+  addStyle({
+    '#getMedia': {
+      position: 'fixed',
+      top: '0.5em',
+      right: '0',
+      padding: '4px',
+      zIndex: '16',
+      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    },
+    '#buttonGetMedia': {
+      backgroundColor: '#e0e0e0',
+      boxShadow: '0 0.3em 0 #808080',
+      padding: '2px',
+      margin: '0.3em',
+    },
+    '#buttonGetMedia:active': {
+      transform: 'translateY(0.2em)',
+      boxShadow: '0 0.1em 0 #808080',
+    },
+    '.alignRight': {
+      textAlign: 'right',
+    },
+  });
   const apiUrl = 'https://api.abema.io/v1';
   const token = localStorage.getItem('abm_token');
   const dateShift = 0;
@@ -72,6 +70,24 @@
 
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  function addStyle(definition) {
+    const style = d.createElement('style');
+    style.textContent = Object.keys(definition)
+      .map((selector) => [
+        `${selector} {`,
+        Object.keys(definition[selector])
+          .map((key) => [
+            '  ',
+            key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`),
+            `: `,
+            definition[selector][key],
+            ';',
+          ].join('')).join('\n'),
+        '}',
+      ].join('\n')).join('\n');
+    d.head.appendChild(style);
   }
 
   function loadFavoriteChannels() {
