@@ -1,45 +1,53 @@
 ﻿// ==UserScript==
-// @name         Copy Title Button
+// @name         Copy Title Button bookmarklet
 // @namespace    https://www.TakeAsh.net/
-// @version      0.1.202304091400
+// @version      0.1.202304221820
 // @description  add Copy Title Button
 // @author       TakeAsh
 // @match        https://abema.tv/video/title/*
+// @require      https://raw.githubusercontent.com/TakeAsh/js-Modules/main/modules/PrepareElement.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=abema.tv
 // @grant        none
 // ==/UserScript==
 
 javascript:
-((d) => {
+(async (d) => {
   'use strict';
-  const style = d.createElement('style');
-  style.textContent = [
-    '.buttonCopyTitle {',
-    'background-color: #d0d0d0;',
-    'box-shadow: 0 0.3em 0 #a0a0a0;',
-    'padding: 0.1em 0.4em;',
-    'border-radius: 6px;',
-    'position: relative;',
-    'z-index: 10;',
-    '}',
-    '.buttonCopyTitle:active {',
-    'transform: translateY(0.2em);',
-    'box-shadow: 0 0.1em 0 #a0a0a0;',
-    '}',
-  ].join('\n');
-  d.head.appendChild(style);
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    const script = d.createElement('script');
+    script.onload = resolve;
+    script.onerror = reject;
+    script.src = src;
+    d.head.appendChild(script);
+  });
+  await loadScript('https://www.takeash.net/js/modules/PrepareElement.js');
+  addStyle({
+    '.buttonCopyTitle': {
+      backgroundColor: '#d0d0d0',
+      boxShadow: '0 0.3em 0 #a0a0a0',
+      padding: '0.1em 0.4em',
+      borderRadius: '6px',
+      position: 'relative',
+      zIndex: '10',
+    },
+    '.buttonCopyTitle:active': {
+      transform: 'translateY(0.2em)',
+      boxShadow: '0 0.1em 0 #a0a0a0',
+    },
+  });
   const ul = getNodesByXpath('//*[@id="main"]//main//section/ul')[0];
   getNodesByXpath('.//a', ul).forEach((a) => {
-    const button = d.createElement('button');
-    button.textContent = 'Copy Title';
-    button.classList.add('buttonCopyTitle');
-    button.addEventListener(
-      'click',
-      (event) => {
-        copyToClipboard(a.textContent);
-        console.log(a.textContent);
-      }
-    );
+    const button = prepareElement({
+      tag: 'button',
+      textContent: 'Copy Title',
+      classes: ['buttonCopyTitle'],
+      events: {
+        'click': (event) => {
+          copyToClipboard(a.textContent);
+          console.log(a.textContent);
+        },
+      },
+    });
     a.parentNode.insertBefore(button, a);
   });
 
