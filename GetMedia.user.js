@@ -1,11 +1,12 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.202304190430
+// @version      0.1.202304221810
 // @description  download media.json
 // @author       take-ash
 // @match        https://abema.tv/timetable
 // @match        https://abema.tv/timetable/*
+// @require      https://raw.githubusercontent.com/TakeAsh/js-Modules/main/modules/PrepareElement.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=abema.tv
 // @grant        none
 // ==/UserScript==
@@ -72,24 +73,6 @@
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  function addStyle(definition) {
-    const style = d.createElement('style');
-    style.textContent = Object.keys(definition)
-      .map((selector) => [
-        `${selector} {`,
-        Object.keys(definition[selector])
-          .map((key) => [
-            '  ',
-            key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`),
-            `: `,
-            definition[selector][key],
-            ';',
-          ].join('')).join('\n'),
-        '}',
-      ].join('\n')).join('\n');
-    d.head.appendChild(style);
-  }
-
   function loadFavoriteChannels() {
     const savedFavoriteChannels = localStorage.getItem(keyFavoriteChannels) || '';
     console.log(`saved FavoriteChannels:\n${savedFavoriteChannels}`);
@@ -117,33 +100,6 @@
       keyFavoriteChannels,
       Object.keys(favoriteChannels).sort().join('\n')
     );
-  }
-
-  function prepareElement(tagInfo) {
-    const tag = tagInfo.tag;
-    if (!tag) { return; }
-    const elm = d.createElement(tag);
-    delete tagInfo.tag;
-    if (tagInfo.classes) {
-      tagInfo.classes.forEach((name) => {
-        elm.classList.add(name);
-      });
-      delete tagInfo.classes;
-    }
-    if (tagInfo.events) {
-      Object.keys(tagInfo.events).forEach((event) => {
-        elm.addEventListener(event, tagInfo.events[event]);
-      });
-      delete tagInfo.events;
-    }
-    if (tagInfo.children) {
-      tagInfo.children.forEach((child) => {
-        elm.appendChild(prepareElement(child));
-      });
-      delete tagInfo.children;
-    }
-    Object.assign(elm, tagInfo);
-    return elm;
   }
 
   function getDate(dateAdd) {
