@@ -1,9 +1,11 @@
 ﻿// ==UserScript==
 // @name         AbemaTV Get Media
 // @namespace    http://TakeAsh.net/
-// @version      0.1.202304221810
+// @version      2025-10-18_13:00
 // @description  download media.json
 // @author       take-ash
+// @match        https://abema.tv/broadcast-schedule
+// @match        https://abema.tv/broadcast-schedule/*
 // @match        https://abema.tv/timetable
 // @match        https://abema.tv/timetable/*
 // @require      https://raw.githubusercontent.com/TakeAsh/js-Modules/main/modules/PrepareElement.js
